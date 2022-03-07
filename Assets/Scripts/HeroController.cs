@@ -1,10 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class HeroController : MonoBehaviour
 {
-
+    public FixedTouchField TouchField;
+    public Joystick joystick;
+    public JoyButton joybutton;
     public CharacterController controller;
     public Animator animator;
     public float speedMove = 3f;
@@ -13,11 +16,15 @@ public class HeroController : MonoBehaviour
     public float minY = -20f;
     public float maxY = 20f;
     private float currentY;
+    
+
+    
 
     // Start is called before the first frame update
     void Start()
     {
         currentY = Camera.main.transform.rotation.eulerAngles.x;
+       
     }
 
     // Update is called once per frame
@@ -25,12 +32,18 @@ public class HeroController : MonoBehaviour
     {
         if (controller.isGrounded)
         {
-            float vertical = Input.GetAxis("Vertical");
-            float mx = Input.GetAxis("Mouse X");
-            float my = Input.GetAxis("Mouse Y");
+            //float vertical = Input.GetAxis("Vertical");
+            //float mx = Input.GetAxis("Mouse X");
+            //float my = Input.GetAxis("Mouse Y");
+            float mx = TouchField.TouchDist.x * 0.1f;
+            float my = TouchField.TouchDist.y * 0.1f;
+            float vertical = joystick.Vertical;
+            float horisontal = joystick.Horizontal;
             if(vertical != 0)
             {
                 controller.Move(transform.forward * vertical * speedMove * Time.deltaTime);
+                controller.Move(transform.right * horisontal * speedMove * Time.deltaTime);
+
                 animator.SetBool("Walk", true);
             }
             else
@@ -49,7 +62,7 @@ public class HeroController : MonoBehaviour
                 Camera.main.transform.rotation = Quaternion.Euler(currentY, camRotation.y, camRotation.z);
             }
 
-            if(Input.GetMouseButton(0))
+            if(joybutton.Pressed)
             {
                 gun.shoot();
                 animator.SetBool("Shoot", true);
@@ -63,9 +76,12 @@ public class HeroController : MonoBehaviour
         controller.Move(Physics.gravity * Time.deltaTime);
     }
 
+  
+    
 
     public void damage()
     {
-        GameManager.instance.deadUnity(gameObject);
+        //GameManager.instance.deadUnity(gameObject);
+     
     }
 }
